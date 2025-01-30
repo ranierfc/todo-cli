@@ -8,11 +8,17 @@ Uma aplicação de linha de comando para gerenciar tarefas, com persistência em
 # Adicionar tarefa
 python src/cli.py --add "Estudar Python"
 
+# Adicionar tarefa com prioridade alta
+python src/cli.py --add "Corrigir bug crítico" --priority alta
+
 # Listar tarefas
 python src/cli.py --list
 
 # Listar tarefas com detalhes
 python src/cli.py --list --verbose
+
+# Listar tarefas de prioridade alta
+python src/cli.py --list --filter-priority alta
 
 # Listar tarefas concluídas
 python src/cli.py --list --filter completed

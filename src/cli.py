@@ -1,6 +1,6 @@
 import argparse
 from datetime import datetime
-from todo import ToDoList
+from todo import ToDoList, Priority
 
 
 def main():
@@ -29,11 +29,23 @@ def main():
         "--completed-after",
         help="Filtrar tarefas concluídas após uma data (YYYY-MM-DD)",
     )
+    parser.add_argument(
+        "--priority",
+        choices=["alta", "media", "baixa"],
+        default="baixa",
+        help="Definir prioridade de tarefa (alta/media/baixa)"
+    )
+    parser.add_argument(
+        "--filter-priority",
+        choices=["alta", "media", "baixa"],
+        help="Filtrar tarefas por prioridade"
+    )
     args = parser.parse_args()
 
     if args.add:
-        todo.add_task(args.add)
-        print(f"Tarefa adicionada: {args.add}")
+        priority = Priority(args.priority)
+        todo.add_task(args.add, priority)
+        print(f"Tarefa adicionada: ({priority.value}): {args.add}")
 
     if args.remove is not None:
         success = todo.remove_task(args.remove)
@@ -41,6 +53,9 @@ def main():
 
     if args.list:
         tasks = todo.list_tasks(args.filter)
+
+        if args.filter_priority:
+            tasks = [t for t in tasks if t["priority"] == args.filter_priority]
 
         if args.created_before:
             tasks = [
@@ -62,6 +77,7 @@ def main():
         if tasks:
             for idx, task in enumerate(tasks):
                 status = "X" if task["completed"] else " "
+                priority = f"[{task['priority'].upper()}]"
                 created = datetime.fromisoformat(task["created_at"]).strftime(
                     "%d/%m/%Y %H:%M"
                 )
@@ -74,11 +90,11 @@ def main():
                 )
 
                 if args.verbose:
-                    print(f"{idx}. [{status}] {task['task']}")
+                    print(f"{idx}. {priority} [{status}] {task['task']}")
                     print(f"\tCriada em: {created}")
                     print(f"\tConcluída em: {completed}\n")
                 else:
-                    print(f"{idx}. [{status}] {task['task']}")
+                    print(f"{idx}. {priority} [{status}] {task['task']}")
         else:
             print("Nenhuma tarefa encontrada!")
 

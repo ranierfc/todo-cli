@@ -1,6 +1,13 @@
 import json
 import os
 from datetime import datetime
+from enum import Enum
+
+
+class Priority(Enum):
+    HIGH = "alta"
+    MEDIUM = "media"
+    LOW = "baixa"
 
 
 class ToDoList:
@@ -19,20 +26,28 @@ class ToDoList:
     def __load_tasks(self) -> list:
         if os.path.exists(self.file_path):
             with open(self.file_path, "r") as f:
-                return json.load(f)
+                tasks = json.load(f)
+                # Garantir retrocompatibilidade para tarefas antigas sem prioridade
+                for task in tasks:
+                    if "priority" not in task:
+                        task["priority"] = Priority.LOW.value
+                return tasks
         return []
 
     def __save_tasks(self) -> None:
         with open(self.file_path, "w") as f:
             json.dump(self.tasks, f, indent=4)
 
-    def add_task(self, task: str) -> None:
-        self.tasks.append({
-            "task": task, 
-            "completed": False,
-            "created_at": datetime.now().isoformat(),
-            "completed_at": None
-            })
+    def add_task(self, task: str, priority: Priority = Priority.LOW) -> None:
+        self.tasks.append(
+            {
+                "task": task,
+                "priority": priority.value,
+                "completed": False,
+                "created_at": datetime.now().isoformat(),
+                "completed_at": None,
+            }
+        )
         self.__save_tasks()
 
     def list_tasks(self, filter_status: str = "all") -> list:
