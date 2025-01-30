@@ -28,3 +28,16 @@ def test_list_tasks(todo: ToDoList):
     pending_tasks = todo.list_tasks(filter_status="pending")
     assert len(pending_tasks) == 1
     assert pending_tasks[0]["task"] == "Tarefa 2"
+
+
+def test_task_creation_date(todo):
+    todo.add_task("Tarefa com data")
+    assert "created_at" in todo.tasks[0]
+    assert isinstance(todo.tasks[0]["created_at"], str)
+
+
+def test_task_completion_date(todo):
+    todo.add_task("Tarefa para concluir")
+    todo.mark_as_completed(0)
+    assert "completed_at" in todo.tasks[0]
+    assert isinstance(todo.tasks[0]["completed_at"], str)
