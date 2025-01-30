@@ -29,9 +29,26 @@ class ToDoList:
         self.tasks.append({"task": task, "completed": False})
         self.__save_tasks()
 
+    def list_tasks(self, filter_status: str = "all") -> list:
+        return [
+            task
+            for task in self.tasks
+            if (filter_status == "completed" and task["completed"])
+            or (filter_status == "pending" and not task["completed"])
+            or filter_status == "all"
+        ]
+
     def remove_task(self, index: int) -> bool:
         try:
             del self.tasks[index]
+            self.__save_tasks()
+            return True
+        except IndexError:
+            return False
+
+    def mark_as_completed(self, index: int) -> bool:
+        try:
+            self.tasks[index]["completed"] = True
             self.__save_tasks()
             return True
         except IndexError:
