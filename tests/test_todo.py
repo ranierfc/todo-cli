@@ -1,5 +1,5 @@
 import pytest
-from src.todo import ToDoList
+from src.todo import ToDoList, Priority
 
 
 @pytest.fixture
@@ -41,3 +41,24 @@ def test_task_completion_date(todo):
     todo.mark_as_completed(0)
     assert "completed_at" in todo.tasks[0]
     assert isinstance(todo.tasks[0]["completed_at"], str)
+
+
+def test_task_priority(todo):
+    todo.add_task("Tarefa sem prioridade")
+    assert todo.tasks[0]["priority"] == Priority.LOW.value
+
+    todo.add_task("Tarefa urgente", Priority.HIGH)
+    assert todo.tasks[1]["priority"] == Priority.HIGH.value
+
+
+def test_filter_by_priority(todo):
+    todo.add_task("Tarefa 1", Priority.HIGH)
+    todo.add_task("Tarefa 2", Priority.MEDIUM)
+
+    high_priority_tasks = todo.list_tasks()
+    high_priority_tasks = [
+        t for t in high_priority_tasks if t["priority"] == Priority.HIGH.value
+    ]
+
+    assert len(high_priority_tasks) == 1
+    assert high_priority_tasks[0]["task"] == "Tarefa 1"
