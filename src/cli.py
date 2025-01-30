@@ -1,4 +1,5 @@
 import argparse
+from datetime import datetime
 from todo import ToDoList
 
 
@@ -17,6 +18,17 @@ def main():
     parser.add_argument(
         "--complete", type=int, help="Marcar tarefa como concluída pelo índice"
     )
+    parser.add_argument(
+        "--verbose", action="store_true", help="Mostrar detalhes completos das tarefas"
+    )
+    parser.add_argument(
+        "--created-before",
+        help="Filtrar tarefas criadas antes de uma data (YYYY-MM-DD)",
+    )
+    parser.add_argument(
+        "--completed-after",
+        help="Filtrar tarefas concluídas após uma data (YYYY-MM-DD)",
+    )
     args = parser.parse_args()
 
     if args.add:
@@ -29,10 +41,44 @@ def main():
 
     if args.list:
         tasks = todo.list_tasks(args.filter)
+
+        if args.created_before:
+            tasks = [
+                t
+                for t in tasks
+                if datetime.fromisoformat(t["created_at"])
+                < datetime.strptime(args.created_before, "%Y-%m-%d")
+            ]
+
+        if args.completed_after:
+            tasks = [
+                t
+                for t in tasks
+                if t["completed"]
+                and datetime.fromisoformat(t["completed_at"])
+                > datetime.strptime(args.completed_after, "%Y-%m-%d")
+            ]
+
         if tasks:
             for idx, task in enumerate(tasks):
                 status = "X" if task["completed"] else " "
-                print(f"{idx}. [{status}] {task['task']}")
+                created = datetime.fromisoformat(task["created_at"]).strftime(
+                    "%d/%m/%Y %H:%M"
+                )
+                completed = (
+                    datetime.fromisoformat(task["completed_at"]).strftime(
+                        "%d/%m/%Y %H:%M"
+                    )
+                    if task["completed_at"]
+                    else "N/A"
+                )
+
+                if args.verbose:
+                    print(f"{idx}. [{status}] {task['task']}")
+                    print(f"\tCriada em: {created}")
+                    print(f"\tConcluída em: {completed}\n")
+                else:
+                    print(f"{idx}. [{status}] {task['task']}")
         else:
             print("Nenhuma tarefa encontrada!")
 

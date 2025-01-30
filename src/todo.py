@@ -1,5 +1,6 @@
 import json
 import os
+from datetime import datetime
 
 
 class ToDoList:
@@ -26,7 +27,12 @@ class ToDoList:
             json.dump(self.tasks, f, indent=4)
 
     def add_task(self, task: str) -> None:
-        self.tasks.append({"task": task, "completed": False})
+        self.tasks.append({
+            "task": task, 
+            "completed": False,
+            "created_at": datetime.now().isoformat(),
+            "completed_at": None
+            })
         self.__save_tasks()
 
     def list_tasks(self, filter_status: str = "all") -> list:
@@ -49,6 +55,7 @@ class ToDoList:
     def mark_as_completed(self, index: int) -> bool:
         try:
             self.tasks[index]["completed"] = True
+            self.tasks[index]["completed_at"] = datetime.now().isoformat()
             self.__save_tasks()
             return True
         except IndexError:
