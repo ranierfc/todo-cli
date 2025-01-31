@@ -33,12 +33,12 @@ def main():
         "--priority",
         choices=["alta", "media", "baixa"],
         default="baixa",
-        help="Definir prioridade de tarefa (alta/media/baixa)"
+        help="Definir prioridade de tarefa (alta/media/baixa)",
     )
     parser.add_argument(
         "--filter-priority",
         choices=["alta", "media", "baixa"],
-        help="Filtrar tarefas por prioridade"
+        help="Filtrar tarefas por prioridade",
     )
     args = parser.parse_args()
 
@@ -74,10 +74,13 @@ def main():
                 > datetime.strptime(args.completed_after, "%Y-%m-%d")
             ]
 
+        real_indexes = [idx for idx, task in enumerate(todo.tasks) if task in tasks]
         if tasks:
-            for idx, task in enumerate(tasks):
+            for display_idx, (real_indexes, task) in enumerate(
+                zip(real_indexes, tasks)
+            ):
                 status = "X" if task["completed"] else " "
-                priority = f"[{task['priority'].upper()}]"
+                priority = f"[{task['priority'].upper()}]" if "priority" in task else ""
                 created = datetime.fromisoformat(task["created_at"]).strftime(
                     "%d/%m/%Y %H:%M"
                 )
@@ -90,11 +93,13 @@ def main():
                 )
 
                 if args.verbose:
-                    print(f"{idx}. {priority} [{status}] {task['task']}")
+                    print(
+                        f"Índice Real: {real_indexes} | Tarefa {display_idx}: {priority} [{status}] {task['task']}"
+                    )
                     print(f"\tCriada em: {created}")
                     print(f"\tConcluída em: {completed}\n")
                 else:
-                    print(f"{idx}. {priority} [{status}] {task['task']}")
+                    print(f"{real_indexes}. {priority} [{status}] {task['task']}")
         else:
             print("Nenhuma tarefa encontrada!")
 
