@@ -39,6 +39,11 @@ python src/cli.py --remove 0
 python src/cli.py --complete 0
 ```
 
+### Importante
+
+Ao usar filtros (`--filter`, `--created-before`, etc.), os índices exibidos são **reais** (referentes à lista completa).
+Use esses índices para remover/editar tarefas, mesmo após filtrar.
+
 ## Requisitos
 
 - Python 3.8+

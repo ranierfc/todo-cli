@@ -62,3 +62,19 @@ def test_filter_by_priority(todo):
 
     assert len(high_priority_tasks) == 1
     assert high_priority_tasks[0]["task"] == "Tarefa 1"
+
+
+def test_remove_task_with_filters(todo):
+    todo.add_task("Tarefa Alta", Priority.HIGH)
+    todo.add_task("Tarefa Baixa", Priority.LOW)
+
+    filtered_tasks = [
+        task for task in todo.tasks if task["priority"] == Priority.LOW.value
+    ]
+    real_indices = [
+        idx for idx, task in enumerate(todo.tasks) if task in filtered_tasks
+    ]
+
+    assert todo.remove_task(real_indices[0]) is True
+    assert len(todo.tasks) == 1
+    assert todo.tasks[0]["priority"] == Priority.HIGH.value
